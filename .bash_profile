@@ -52,5 +52,7 @@ if [ -f `brew --prefix`/etc/bash_completion.d/vagrant ]; then
     source `brew --prefix`/etc/bash_completion.d/vagrant
 fi
 
-# z
-. /usr/local/etc/profile.d/z.sh
+# z - jump-around
+if which brew &> /dev/null && [ -f "$(brew --prefix)/etc/profile.d/z.sh" ]; then
+  . "$(brew --prefix)/etc/profile.d/z.sh"
+fi;
