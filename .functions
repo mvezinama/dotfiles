@@ -152,6 +152,16 @@ if [ ! $(uname -s) = 'Darwin' ]; then
 	fi
 fi
 
+# `s` with no arguments opens the current directory in Sublime Text, otherwise
+# opens the given location
+function c() {
+	if [ $# -eq 0 ]; then
+		code .;
+	else
+		code "$@";
+	fi;
+}
+
 # `o` with no arguments opens the current directory, otherwise opens the given
 # location
 function o() {
@@ -160,6 +170,85 @@ function o() {
 	else
 		open "$@";
 	fi;
+}
+
+# `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
+# the `.git` directory, listing directories first. The output gets piped into
+# `less` with options to preserve color and line numbers, unless the output is
+# small enough for one screen.
+function tre() {
+	tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
+}
+
+# Convert .flac to .mp3 inside the current dir
+# lame:
+# --ta <artist>   audio/song artist (max 30 chars for version 1 tag)
+# --tl <album>    audio/song album (max 30 chars for version 1 tag)
+# --ty <year>     audio/song year of issue (1 to 9999)
+# --ti <file>     audio/song albumArt (jpeg/png/gif file, v2.3 tag)
+function flactomp3() {
+  COUNTER=0
+  TOTAL=0
+
+  for f in *.flac
+  do
+    let COUNTER+=1
+  done
+
+  let TOTAL=COUNTER
+  let COUNTER=0
+
+	for f in *.flac
+  do
+    filename=$(basename "$f")
+    extension="${filename##*.}"
+    filename="${filename%.*}"
+    let COUNTER+=1
+    flac -cd "$f" | lame "$@" --tt "$filename" --tn $COUNTER/$TOTAL --preset extreme - - > "$filename".mp3
+	done
+}
+
+# animated gifs from any video
+# from alex sexton   gist.github.com/SlexAxton/4989674
+gifify() {
+  if [[ -n "$1" ]]; then
+  if [[ $2 == '--good' ]]; then
+    ffmpeg -i $1 -r 10 -vcodec png out-static-%05d.png
+    time convert -verbose +dither -layers Optimize -resize 900x900\> out-static*.png  GIF:- | gifsicle --colors 128 --delay=5 --loop --optimize=3 --multifile - > $1.gif
+    rm out-static*.png
+  else
+    ffmpeg -i $1 -s 600x400 -pix_fmt rgb24 -r 10 -f gif - | gifsicle --optimize=3 --delay=3 > $1.gif
+  fi
+  else
+  echo "proper usage: gifify <input_movie.mov>. You DO need to include extension."
+  fi
+}
+
+# Open man page as PDF
+function manpdf() {
+ man -t "${1}" | open -f -a /Applications/Preview.app/
+}
+
+# Function to quickly create an application icon from 1024px master file.
+function mkicns() {
+    if [[ -z "$@" ]]; then
+        echo "Input file missing (1024px master file)"
+    else
+        filename=${1%.*}
+        mkdir $filename.iconset
+        sips -z 16 16   $1 --out $filename.iconset/icon_16x16.png
+        sips -z 32 32   $1 --out $filename.iconset/icon_16x16@2x.png
+        sips -z 32 32   $1 --out $filename.iconset/icon_32x32.png
+        sips -z 64 64   $1 --out $filename.iconset/icon_32x32@2x.png
+        sips -z 128 128 $1 --out $filename.iconset/icon_128x128.png
+        sips -z 256 256 $1 --out $filename.iconset/icon_128x128@2x.png
+        sips -z 256 256 $1 --out $filename.iconset/icon_256x256.png
+        sips -z 512 512 $1 --out $filename.iconset/icon_256x256@2x.png
+        sips -z 512 512 $1 --out $filename.iconset/icon_512x512.png
+        cp $1 $filename.iconset/icon_512x512@2x.png
+        iconutil -c icns $filename.iconset
+        rm -r $filename.iconset
+    fi
 }
 
 # `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring

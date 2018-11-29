@@ -12,8 +12,17 @@ alias -- -="cd -"
 alias d="cd ~/Documents/Dropbox"
 alias dl="cd ~/Downloads"
 alias dt="cd ~/Desktop"
-alias p="cd ~/projects"
 alias g="git"
+alias b="git browse"
+alias h="history"
+alias j="jobs"
+alias q="qlmanage -p "
+alias n="npm"
+alias y="yarn"
+alias start="yarn start"
+alias r="yarn run"
+alias develop="yarn run develop"
+alias dev="yarn run dev"
 
 # Detect which `ls` flavor is in use
 if ls --color > /dev/null 2>&1; then # GNU `ls`
@@ -149,3 +158,21 @@ alias reload="exec ${SHELL} -l"
 
 # Print each PATH entry on a separate line
 alias path='echo -e ${PATH//:/\\n}'
+
+# Eject All Mountable Volumes
+alias eject="osascript -e 'tell application \"Finder\" to eject (every disk whose ejectable is true)'"
+
+# Keep it up for 1h
+alias coffee="caffeinate -u -t 3600"
+
+# Search via Locate : the -i modifier makes the search case insensitive.
+alias loc="locate -i"
+
+# https://twitter.com/liamosaur/status/506975850596536320
+alias fuck='sudo $(history -p \!\!)'
+
+# SourceTree
+alias stree='open -a SourceTree'
+
+# Use hub. https://hub.github.com/
+alias git="hub"
